@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: colasdb
+      POSTGRES_USER: colasuser
+      POSTGRES_PASSWORD: colaspass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U colasuser -d colasdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: colasdb
+      DB_USER: colasuser
+      DB_PASSWORD: colaspass
+      SOCRATA_BASE_URL: https://data.ttb.gov
+      SOCRATA_APP_TOKEN: ""
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount frontend for live dev without rebuilding the image
+      - ./frontend:/frontend:ro
+
+volumes:
+  pgdata:

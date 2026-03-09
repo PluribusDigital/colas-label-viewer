@@ -1,0 +1,14 @@
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/controller/ImageProxyController.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/service/ImageProxyService.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/repository/ColaRepository.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/service/ColaSearchService.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/model/ColaRecord.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/model/PagedResponse.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/config/WebMvcConfig.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/model/IngestResult.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/service/ColaIngestionService.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/config/WebClientConfig.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/controller/ColaController.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/ColasLabelViewerApplication.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/model/ColaDto.java
+/Users/kmaia/Code/TTB/colas-label-viewer/backend/src/main/java/gov/treas/ttb/cola/viewer/model/SocrataRecord.java

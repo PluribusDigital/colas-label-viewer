@@ -1,0 +1,27 @@
+[
+  {
+    "ttb_id": "12345678",
+    "brand_name": "BUFFALO TRACE",
+    "fanciful_name": "Single Barrel",
+    "class_type_description": "BOURBON WHISKY",
+    "applicant_name": "Buffalo Trace Distillery",
+    "approval_date": "2023-05-10T00:00:00.000",
+    "status": "APPROVED",
+    "label_image_file": "/images/cola/12345678.jpg",
+    "series_id": "SER-001",
+    "beverage_type": "DISTILLED SPIRITS",
+    "extra_unknown_field": "should be ignored"
+  },
+  {
+    "ttb_id": "87654321",
+    "brand_name": "SILVER OAK",
+    "fanciful_name": null,
+    "class_type_description": "CABERNET SAUVIGNON",
+    "applicant_name": "Silver Oak Wine Cellars",
+    "approval_date": "2022-11-20T00:00:00.000",
+    "status": "APPROVED",
+    "label_image_file": "https://www.ttb.gov/images/cola/87654321.png",
+    "series_id": null,
+    "beverage_type": "WINE"
+  }
+]

@@ -1,0 +1,252 @@
+/* ── Reset & base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f4f5f7;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+header {
+  background: #1a1a2e;
+  color: #fff;
+  padding: 1.25rem 2rem;
+}
+.header-inner { max-width: 1400px; margin: 0 auto; }
+header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.01em; }
+.subtitle { font-size: 0.82rem; opacity: 0.65; margin-top: 0.2rem; }
+
+/* ── Search bar ──────────────────────────────────────────────────── */
+.search-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e2e4ea;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  max-width: 100%;
+}
+
+#searchInput {
+  flex: 1 1 280px;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid #d0d3dc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#searchInput:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74,111,165,0.15);
+}
+
+#beverageFilter {
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #d0d3dc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+#ingestBtn {
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  background: #4a6fa5;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+#ingestBtn:hover:not(:disabled) { background: #3b5c8a; }
+#ingestBtn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── Results meta ────────────────────────────────────────────────── */
+.results-meta {
+  padding: 0.55rem 2rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ── Card grid ───────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1.1rem;
+  padding: 1rem 2rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cola-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  display: flex;
+  flex-direction: column;
+}
+.cola-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 16px rgba(0,0,0,0.13);
+}
+
+/* Fixed-height image container handles inconsistent TTB label dimensions */
+.label-img-wrap {
+  width: 100%;
+  height: 175px;
+  background: #f0f1f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.label-img {
+  max-width: 100%;
+  max-height: 175px;
+  object-fit: contain;
+  padding: 6px;
+}
+.label-img.img-error { opacity: 0.25; }
+
+.card-info {
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  flex: 1;
+}
+.brand-name { font-size: 0.85rem; font-weight: 700; line-height: 1.25; }
+.fanciful   { font-size: 0.75rem; color: #555; font-style: italic; }
+.class-type { font-size: 0.72rem; color: #6b7280; }
+.applicant  { font-size: 0.68rem; color: #9ca3af; margin-top: auto; padding-top: 0.25rem; }
+.date       { font-size: 0.67rem; color: #b0b7c3; }
+
+.status {
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.15rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.status--approved { background: #d1fae5; color: #065f46; }
+.status--deleted  { background: #fee2e2; color: #991b1b; }
+.status--other    { background: #e5e7eb; color: #374151; }
+
+/* ── Pagination ──────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.25rem 2rem 2rem;
+}
+.pagination button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  background: #4a6fa5;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.14s;
+}
+.pagination button:hover { background: #3b5c8a; }
+.pagination span { font-size: 0.85rem; color: #6b7280; }
+
+/* ── Modal ───────────────────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal.hidden { display: none; }
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  max-width: 680px;
+  width: 92%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  z-index: 1;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #9ca3af;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.modal-close:hover { color: #374151; background: #f3f4f6; }
+
+.modal-label-img {
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  background: #f4f5f7;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  padding: 8px;
+}
+.modal-label-img.img-error { opacity: 0.2; }
+
+#modalBody dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.45rem 0.75rem;
+  font-size: 0.88rem;
+}
+#modalBody dt { font-weight: 600; color: #6b7280; align-self: start; }
+#modalBody dd { color: #1a1a2e; word-break: break-word; }
+
+/* ── Empty / error states ────────────────────────────────────────── */
+.empty-state, .error-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+}
+.error-state { color: #b91c1c; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .search-bar { padding: 0.75rem 1rem; }
+  .card-grid  { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); padding: 0.75rem 1rem 1.5rem; gap: 0.75rem; }
+  .label-img-wrap { height: 130px; }
+  .label-img { max-height: 130px; }
+  .results-meta { padding: 0.4rem 1rem; }
+}

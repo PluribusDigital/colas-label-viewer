@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: colas-label-viewer
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:colasdb}
+    username: ${DB_USER:colasuser}
+    password: ${DB_PASSWORD:colaspass}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    locations: classpath:db/migration
+
+ttb:
+  socrata:
+    base-url: ${SOCRATA_BASE_URL:https://data.ttb.gov}
+    app-token: ${SOCRATA_APP_TOKEN:}
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/css,text/javascript
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    gov.treas.ttb: INFO
+    org.flywaydb: INFO
