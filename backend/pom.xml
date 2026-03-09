@@ -108,6 +108,13 @@
             <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- CSV parsing for TTBOnline bulk download -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
     </dependencies>
 
     <build>

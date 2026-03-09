@@ -28,8 +28,8 @@ services:
       DB_NAME: colasdb
       DB_USER: colasuser
       DB_PASSWORD: colaspass
-      SOCRATA_BASE_URL: https://data.ttb.gov
-      SOCRATA_APP_TOKEN: ""
+      TTB_ONLINE_BASE_URL: https://www.ttbonline.gov
+      TTB_INGEST_FROM_DATE: "2023-01-01"
     ports:
       - "8080:8080"
     volumes:

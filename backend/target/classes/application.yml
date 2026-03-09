@@ -29,9 +29,9 @@ spring:
     locations: classpath:db/migration
 
 ttb:
-  socrata:
-    base-url: ${SOCRATA_BASE_URL:https://data.ttb.gov}
-    app-token: ${SOCRATA_APP_TOKEN:}
+  online:
+    base-url: ${TTB_ONLINE_BASE_URL:https://www.ttbonline.gov}
+    ingest-from-date: ${TTB_INGEST_FROM_DATE:2022-01-01}
 
 server:
   port: 8080

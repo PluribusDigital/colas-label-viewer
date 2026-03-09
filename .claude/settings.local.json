@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do\")",
+      "Bash(curl -s -X POST \"https://www.ttbonline.gov/colasonline/publicSearchColasBasicProcess.do?action=search\" -d \"searchCriteria.brandName=buffalo+trace&searchCriteria.alcoholTypeCode=DISTILLED_SPIRITS&maxRows=5&startAt=1\" -H \"Content-Type: application/x-www-form-urlencoded\")"
+    ]
+  }
+}

@@ -1,9 +1,8 @@
 package gov.treas.ttb.cola.viewer.service;
 
-import gov.treas.ttb.cola.viewer.model.ColaRecord;
-import gov.treas.ttb.cola.viewer.model.SocrataRecord;
-import gov.treas.ttb.cola.viewer.repository.ColaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.treas.ttb.cola.viewer.model.ColaRecord;
+import gov.treas.ttb.cola.viewer.repository.ColaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static gov.treas.ttb.cola.viewer.service.ColaIngestionService.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,167 +27,97 @@ class ColaIngestionServiceTest {
         service = new ColaIngestionService(null, colaRepository, new ObjectMapper());
     }
 
-    // normalize()
+    // ── stripTtbIdApostrophe ──────────────────────────────────────────────────
 
-    @Test
-    void normalize_null_returnsNull() {
-        assertThat(normalize(null)).isNull();
+    @Test void stripTtbId_null_returnsNull() { assertThat(stripTtbIdApostrophe(null)).isNull(); }
+    @Test void stripTtbId_blank_returnsNull() { assertThat(stripTtbIdApostrophe("  ")).isNull(); }
+
+    @Test void stripTtbId_leadingApostrophe_stripped() {
+        assertThat(stripTtbIdApostrophe("'24009001000244")).isEqualTo("24009001000244");
+    }
+    @Test void stripTtbId_noApostrophe_unchanged() {
+        assertThat(stripTtbIdApostrophe("24009001000244")).isEqualTo("24009001000244");
+    }
+    @Test void stripTtbId_leadingZeros_preserved() {
+        assertThat(stripTtbIdApostrophe("'03211001000018")).isEqualTo("03211001000018");
     }
 
-    @Test
-    void normalize_blank_returnsNull() {
-        assertThat(normalize("   ")).isNull();
+    // ── normalize ─────────────────────────────────────────────────────────────
+
+    @Test void normalize_null_returnsNull() { assertThat(normalize(null)).isNull(); }
+    @Test void normalize_blank_returnsNull() { assertThat(normalize("  ")).isNull(); }
+    @Test void normalize_na_returnsNull() { assertThat(normalize("N/A")).isNull(); }
+    @Test void normalize_whitespace_stripped() {
+        assertThat(normalize("  BUFFALO TRACE  ")).isEqualTo("BUFFALO TRACE");
     }
 
-    @Test
-    void normalize_emptyString_returnsNull() {
-        assertThat(normalize("")).isNull();
+    // ── parseMdyDate ──────────────────────────────────────────────────────────
+
+    @Test void parseMdyDate_null_returnsNull() { assertThat(parseMdyDate(null)).isNull(); }
+    @Test void parseMdyDate_blank_returnsNull() { assertThat(parseMdyDate("")).isNull(); }
+    @Test void parseMdyDate_valid_parsed() {
+        assertThat(parseMdyDate("03/20/2020")).isEqualTo(LocalDate.of(2020, 3, 20));
+    }
+    @Test void parseMdyDate_malformed_returnsNull() {
+        assertThat(parseMdyDate("2020-03-20")).isNull();
     }
 
-    @Test
-    void normalize_nA_uppercase_returnsNull() {
-        assertThat(normalize("N/A")).isNull();
+    // ── deriveBeverageType ────────────────────────────────────────────────────
+
+    @Test void deriveBeverageType_null_returnsNull() { assertThat(deriveBeverageType(null)).isNull(); }
+
+    @Test void deriveBeverageType_wine_detected() {
+        assertThat(deriveBeverageType("TABLE RED WINE")).isEqualTo("WINE");
+        assertThat(deriveBeverageType("CHAMPAGNE")).isEqualTo("WINE");
+        assertThat(deriveBeverageType("HARD CIDER")).isEqualTo("WINE");
+    }
+    @Test void deriveBeverageType_beer_detected() {
+        assertThat(deriveBeverageType("DOMESTIC ALE")).isEqualTo("MALT BEVERAGES");
+        assertThat(deriveBeverageType("AMERICAN LAGER")).isEqualTo("MALT BEVERAGES");
+    }
+    @Test void deriveBeverageType_spirits_default() {
+        assertThat(deriveBeverageType("STRAIGHT BOURBON WHISKY")).isEqualTo("DISTILLED SPIRITS");
+        assertThat(deriveBeverageType("BRANDY")).isEqualTo("DISTILLED SPIRITS");
     }
 
-    @Test
-    void normalize_nA_lowercase_returnsNull() {
-        assertThat(normalize("n/a")).isNull();
+    // ── parseCsv ─────────────────────────────────────────────────────────────
+
+    static final String SAMPLE_CSV = """
+            TTB ID,Permit No.,Serial Number,Completed Date,Fanciful Name,Brand Name,Origin,Origin Desc,Class/Type,Class/Type Desc
+            '24009001000244,DSP-KY-113,240013,02/09/2024,SBS,BUFFALO TRACE,22,KENTUCKY,101,STRAIGHT BOURBON WHISKY
+            '03211001000018,BW-MI-159,030035,12/18/2025,CASCADE VAL,CASCADE WINERY,06,MICHIGAN,80,TABLE RED WINE
+            ,DSP-KY-113,BADROW,01/01/2024,,BLANK ID,22,KENTUCKY,101,STRAIGHT BOURBON WHISKY
+            """;
+
+    @Test void parseCsv_validRows_mapped() {
+        assertThat(service.parseCsv(SAMPLE_CSV)).hasSize(2);  // blank-TTB-ID row skipped
     }
 
-    @Test
-    void normalize_nA_mixedCase_returnsNull() {
-        assertThat(normalize("N/a")).isNull();
-    }
-
-    @Test
-    void normalize_leadingTrailingWhitespace_isStripped() {
-        assertThat(normalize("  Buffalo Trace  ")).isEqualTo("Buffalo Trace");
-    }
-
-    @Test
-    void normalize_validValue_returnsValue() {
-        assertThat(normalize("BUFFALO TRACE")).isEqualTo("BUFFALO TRACE");
-    }
-
-    // parseDate()
-
-    @Test
-    void parseDate_null_returnsNull() {
-        assertThat(parseDate(null)).isNull();
-    }
-
-    @Test
-    void parseDate_blank_returnsNull() {
-        assertThat(parseDate("  ")).isNull();
-    }
-
-    @Test
-    void parseDate_socrataIsoDatetime_parsed() {
-        assertThat(parseDate("2024-01-15T00:00:00.000")).isEqualTo(LocalDate.of(2024, 1, 15));
-    }
-
-    @Test
-    void parseDate_isoDate_parsed() {
-        assertThat(parseDate("2020-06-30")).isEqualTo(LocalDate.of(2020, 6, 30));
-    }
-
-    @Test
-    void parseDate_malformed_returnsNull() {
-        assertThat(parseDate("01/15/2024")).isNull();
-    }
-
-    @Test
-    void parseDate_randomString_returnsNull() {
-        assertThat(parseDate("not-a-date")).isNull();
-    }
-
-    // buildImageUrl()
-
-    @Test
-    void buildImageUrl_null_returnsNull() {
-        assertThat(buildImageUrl(null)).isNull();
-    }
-
-    @Test
-    void buildImageUrl_blank_returnsNull() {
-        assertThat(buildImageUrl("  ")).isNull();
-    }
-
-    @Test
-    void buildImageUrl_partialPath_prependsTtbBase() {
-        assertThat(buildImageUrl("/images/foo.jpg"))
-                .isEqualTo("https://www.ttb.gov/images/foo.jpg");
-    }
-
-    @Test
-    void buildImageUrl_fullHttpUrl_returnedAsIs() {
-        assertThat(buildImageUrl("https://example.com/label.jpg"))
-                .isEqualTo("https://example.com/label.jpg");
-    }
-
-    @Test
-    void buildImageUrl_fullHttpsUrl_returnedAsIs() {
-        assertThat(buildImageUrl("https://www.ttb.gov/images/label.jpg"))
-                .isEqualTo("https://www.ttb.gov/images/label.jpg");
-    }
-
-    @Test
-    void buildImageUrl_whitespaceStripped() {
-        assertThat(buildImageUrl("  /images/label.jpg  "))
-                .isEqualTo("https://www.ttb.gov/images/label.jpg");
-    }
-
-    // toEntity()
-
-    @Test
-    void toEntity_nullTtbId_returnsNull() {
-        SocrataRecord sr = new SocrataRecord(null, "Brand", null, null, null, null, null, null, null, null);
-        assertThat(service.toEntity(sr)).isNull();
-    }
-
-    @Test
-    void toEntity_blankTtbId_returnsNull() {
-        SocrataRecord sr = new SocrataRecord("  ", "Brand", null, null, null, null, null, null, null, null);
-        assertThat(service.toEntity(sr)).isNull();
-    }
-
-    @Test
-    void toEntity_validRecord_mapsAllFields() {
-        SocrataRecord sr = new SocrataRecord(
-                "12345678",
-                "  BUFFALO TRACE  ",
-                "Single Barrel",
-                "BOURBON WHISKY",
-                "Buffalo Trace Distillery",
-                "2023-05-10T00:00:00.000",
-                "APPROVED",
-                "/images/cola/12345678.jpg",
-                "SER-001",
-                "DISTILLED SPIRITS"
-        );
-        ColaRecord r = service.toEntity(sr);
-
-        assertThat(r).isNotNull();
-        assertThat(r.getTtbId()).isEqualTo("12345678");
+    @Test void parseCsv_spiritsRecord_fieldsCorrect() {
+        ColaRecord r = service.parseCsv(SAMPLE_CSV).get(0);
+        assertThat(r.getTtbId()).isEqualTo("24009001000244");
         assertThat(r.getBrandName()).isEqualTo("BUFFALO TRACE");
-        assertThat(r.getFancifulName()).isEqualTo("Single Barrel");
-        assertThat(r.getClassType()).isEqualTo("BOURBON WHISKY");
-        assertThat(r.getApplicantName()).isEqualTo("Buffalo Trace Distillery");
-        assertThat(r.getApprovalDate()).isEqualTo(LocalDate.of(2023, 5, 10));
+        assertThat(r.getFancifulName()).isEqualTo("SBS");
+        assertThat(r.getClassType()).isEqualTo("STRAIGHT BOURBON WHISKY");
+        assertThat(r.getApplicantName()).isEqualTo("KENTUCKY");
+        assertThat(r.getApprovalDate()).isEqualTo(LocalDate.of(2024, 2, 9));
         assertThat(r.getStatus()).isEqualTo("APPROVED");
-        assertThat(r.getLabelImageUrl()).isEqualTo("https://www.ttb.gov/images/cola/12345678.jpg");
-        assertThat(r.getSeriesId()).isEqualTo("SER-001");
+        assertThat(r.getSeriesId()).isEqualTo("DSP-KY-113");
         assertThat(r.getBeverageType()).isEqualTo("DISTILLED SPIRITS");
-        assertThat(r.getRawJson()).contains("12345678");
+        assertThat(r.getLabelImageUrl()).isNull();
     }
 
-    @Test
-    void toEntity_naFieldsTreatedAsNull() {
-        SocrataRecord sr = new SocrataRecord("99999", "N/A", "n/a", null, null, null, "APPROVED", null, null, null);
-        ColaRecord r = service.toEntity(sr);
+    @Test void parseCsv_wineRecord_beverageTypeWine() {
+        assertThat(service.parseCsv(SAMPLE_CSV).get(1).getBeverageType()).isEqualTo("WINE");
+    }
 
-        assertThat(r).isNotNull();
-        assertThat(r.getBrandName()).isNull();
-        assertThat(r.getFancifulName()).isNull();
+    @Test void parseCsv_blankTtbId_rowSkipped() {
+        assertThat(service.parseCsv(SAMPLE_CSV))
+                .noneMatch(r -> r.getTtbId() == null || r.getTtbId().isBlank());
+    }
+
+    @Test void parseCsv_nullOrEmpty_returnsEmptyList() {
+        assertThat(service.parseCsv("")).isEmpty();
+        assertThat(service.parseCsv(null)).isEmpty();
     }
 }
