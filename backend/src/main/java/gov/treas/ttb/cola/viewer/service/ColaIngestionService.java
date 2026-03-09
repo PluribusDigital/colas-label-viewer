@@ -62,7 +62,7 @@ public class ColaIngestionService {
         return new IngestResult(total, Instant.now());
     }
 
-    List<SocrataRecord> fetchPage(int offset) {
+    public List<SocrataRecord> fetchPage(int offset) {
         return socrataWebClient.get()
                 .uri(b -> b.path(RESOURCE_PATH)
                            .queryParam("$limit", PAGE_SIZE)
